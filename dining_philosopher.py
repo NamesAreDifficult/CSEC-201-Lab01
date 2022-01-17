@@ -7,9 +7,11 @@ Brian McNulty bmm7914 NamesAreDifficult
 
 import threading
 import time
-philosophers_num = 5
+import random
+
+philosophers_num = random.randint(2, 20)
 go = True
-forkl = []
+forks = []
 
 class Philosopher(threading.Thread):
     def __init__(self, threadID):
@@ -21,26 +23,28 @@ class Philosopher(threading.Thread):
         global philosophers_num
         while go:
             print(f"philosopher {self.id} is thinking...")
-            if forkl[self.id].acquire() and forkl[(self.id + 1) % 5].acquire():
+            if not forks[self.id].locked() and not forks[(self.id + 1) % philosophers_num].locked():
+                forks[self.id].acquire()
+                forks[(self.id + 1) % philosophers_num].acquire()
                 print(f"philosopher {self.id} picks up left fork.")
                 print(f"philosopher {self.id} picks up right fork")
                 print(f"philosopher {self.id} is eating...")
                 print(f"philosopher {self.id} puts down left fork.")
+                forks[(self.id + 1) % philosophers_num].release()
                 print(f"philosopher {self.id} puts down right fork.")
-                forkl[self.id].release()
-                forkl[(self.id + 1) % 5].release()
+                forks[self.id].release()
 
        
 def main():
     global philosophers_num
     global go
 
-    philosophers_num = 5
+    philosophers_num = 2
     threads = []
     for i in range(philosophers_num):
         thread = Philosopher(i)
         threads.append(thread)
-        forkl.append(threading.Lock())
+        forks.append(threading.Lock())
 
     for i in range(philosophers_num):
         threads[i].start()
@@ -48,4 +52,5 @@ def main():
     time.sleep(2)
     go = False
 
-main()
+if __name__ == "__main__":
+    main()
