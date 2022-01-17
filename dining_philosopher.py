@@ -9,7 +9,7 @@ import threading
 import time
 philosophers_num = 5
 go = True
-forks = dict()
+forkl = []
 
 class Philosopher(threading.Thread):
     def __init__(self, threadID):
@@ -18,33 +18,29 @@ class Philosopher(threading.Thread):
 
     def run(self):
         global go
-        global forks
         global philosophers_num
         while go:
             print(f"philosopher {self.id} is thinking...")
-            if not forks[self.id] and not forks[(self.id + 1) % 5]:
-                forks[self.id] = True
-                forks[(self.id + 1) % 5] = True
+            if forkl[self.id].acquire() and forkl[(self.id + 1) % 5].acquire():
                 print(f"philosopher {self.id} picks up left fork.")
                 print(f"philosopher {self.id} picks up right fork")
                 print(f"philosopher {self.id} is eating...")
                 print(f"philosopher {self.id} puts down left fork.")
                 print(f"philosopher {self.id} puts down right fork.")
-                forks[self.id] = False
-                forks[(self.id + 1) % 5] = False
+                forkl[self.id].release()
+                forkl[(self.id + 1) % 5].release()
 
        
 def main():
     global philosophers_num
     global go
-    global forks
 
     philosophers_num = 5
     threads = []
     for i in range(philosophers_num):
         thread = Philosopher(i)
         threads.append(thread)
-        forks[i] = False
+        forkl.append(threading.Lock())
 
     for i in range(philosophers_num):
         threads[i].start()
