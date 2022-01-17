@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
     message = "Hello, Welcome to CSEC 201!"
     enc_message = b'gAAAAABhC01A7xgSLLzoZ_DD-WtMtmawT4dwB-R2UOmsBowJqBOS0HWjx42rcIVFx_3bMdtJlH0zLFVLdTx3mx5F8K1I3k0ykoYX5M0eeZuJgeff82KPoGY='
-    print('Slow search starts...')
+    print('Fast search starts...')
     start = time.perf_counter()
     key_source = key_search(message, enc_message)
     print(f"key source found is {key_source}")
