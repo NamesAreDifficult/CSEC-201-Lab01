@@ -9,7 +9,7 @@ import threading
 import time
 import random
 
-philosophers_num = random.randint(2, 20)
+philosophers_num = 2 #random.randint(2, 20)
 go = True
 forks = []
 
@@ -23,16 +23,18 @@ class Philosopher(threading.Thread):
         global philosophers_num
         while go:
             print(f"philosopher {self.id} is thinking...")
-            if not forks[self.id].locked() and not forks[(self.id + 1) % philosophers_num].locked():
-                forks[self.id].acquire()
-                forks[(self.id + 1) % philosophers_num].acquire()
+            if forks[self.id].acquire():
                 print(f"philosopher {self.id} picks up left fork.")
+            if forks[(self.id + 1) % philosophers_num].acquire(False):
                 print(f"philosopher {self.id} picks up right fork")
                 print(f"philosopher {self.id} is eating...")
                 print(f"philosopher {self.id} puts down left fork.")
                 forks[(self.id + 1) % philosophers_num].release()
                 print(f"philosopher {self.id} puts down right fork.")
                 forks[self.id].release()
+            else:
+                forks[self.id].release()
+                print(f"philosopher {self.id} puts down the left fork.")
 
        
 def main():
@@ -49,7 +51,7 @@ def main():
     for i in range(philosophers_num):
         threads[i].start()
 
-    time.sleep(2)
+    time.sleep(0.0001)
     go = False
 
 if __name__ == "__main__":
